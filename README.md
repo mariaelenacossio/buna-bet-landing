@@ -112,15 +112,44 @@ Two settings that will bite if forgotten:
 
 ### Moving to a custom domain later
 
-1. Delete `basePath` and `assetPrefix` from `next.config.mjs`. Leaving them
-   serves the site at `example.com/buna-bet-landing/` and every asset 404s.
+1. In `next.config.mjs`, set the `basePath` constant to `""`. It is the single
+   source of truth: it flows into `basePath`, `assetPrefix`, and
+   `NEXT_PUBLIC_BASE_PATH` together, so nothing else needs editing. Leaving the
+   repo-name prefix serves the site at `example.com/buna-bet-landing/` and 404s.
 2. Add `public/CNAME` containing the bare domain.
 3. At the registrar, point a `CNAME` record at `mariaelenacossio.github.io`, or
    `A` records at GitHub's apex IPs for a root domain.
 4. Set `metadataBase` and add an OG image in `app/layout.tsx`.
 
+Note on `public/` assets: files there (the story videos, future gallery photos)
+are **not** basePath-prefixed by Next automatically, only `next/image` and
+`next/link` are. Reference them through `lib/assetPath.ts`, which prepends
+`NEXT_PUBLIC_BASE_PATH`. A raw `<video src="/videos/x.mp4">` would 404 on the
+project page. This is why the domain switch above needs no asset edits.
+
 Vercel also still works from this repo. `output: 'export'` is compatible with
 it; the `basePath` is the only thing that would need removing.
+
+## Video story section
+
+`components/VideoStory.tsx` is a scroll-driven three-act video narrative
+(highland, roast, ceremony) sitting between the Story and Services sections.
+Copy lives in `lib/videoStoryData.ts`; source clips are in `public/videos/`.
+
+It is progressive enhancement, not one layout with tweaks:
+
+- **Desktop, motion allowed:** each act pins full-screen while you scroll
+  through it (`components/video-story/VideoAct.tsx`), with per-act
+  `useScroll`/`useTransform` driving text fade and a subtle 1.0 to 1.08 video
+  zoom.
+- **Mobile (<768px) or `prefers-reduced-motion`:** a stacked layout with no
+  pinning or scroll-hijacking. Reduced motion additionally shows a still frame
+  instead of autoplaying. This stacked version is also the server-rendered
+  baseline, so it works with JS disabled (text is in the HTML; videos are the
+  only thing that needs JS).
+
+Videos lazy-load via IntersectionObserver (`LazyVideo.tsx`), so the initial
+page load does not fetch all three at once.
 
 ## Notes
 

@@ -5,6 +5,7 @@ import Hero from "@/components/Hero";
 import MeetAbol from "@/components/MeetAbol";
 import Services from "@/components/Services";
 import Story from "@/components/Story";
+import VideoStory from "@/components/VideoStory";
 
 export default function Home() {
   return (
@@ -12,6 +13,7 @@ export default function Home() {
       <Hero />
       <main id="main">
         <Story />
+        <VideoStory />
         <Services />
         <MeetAbol />
         <Gallery />
