@@ -5,10 +5,14 @@
  * so every route and asset needs the repo name as a prefix.
  *
  * IF YOU MOVE TO A CUSTOM DOMAIN (or a username.github.io root repo):
- * delete basePath and assetPrefix below, and add a CNAME file to public/ with
- * the bare domain. Leaving them in place on a custom domain serves the site at
- * example.com/buna-bet-landing/ and every asset 404s at the root.
+ * set basePath to "" below (one line, single source of truth). It flows into
+ * basePath, assetPrefix, and NEXT_PUBLIC_BASE_PATH together, and also add a
+ * CNAME file to public/ with the bare domain. Leaving a repo-name prefix on a
+ * custom domain serves the site at example.com/buna-bet-landing/ and 404s.
  */
+
+// Single source of truth. Empty string = root / custom domain.
+const basePath = "/buna-bet-landing";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -21,8 +25,13 @@ const nextConfig = {
   // src would need the loader configured, or it will fail at build.
   images: { unoptimized: true },
 
-  basePath: "/buna-bet-landing",
-  assetPrefix: "/buna-bet-landing",
+  basePath,
+  assetPrefix: basePath,
+
+  // Exposes basePath to client code. next/image and next/link prefix
+  // automatically; raw <video>/<img> src to files in public/ do NOT, so
+  // components read this via lib/assetPath.ts to build correct URLs.
+  env: { NEXT_PUBLIC_BASE_PATH: basePath },
 
   // Pages serves /about as /about/index.html, so emit directories not .html files.
   trailingSlash: true,
