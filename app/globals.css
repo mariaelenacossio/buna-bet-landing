@@ -2,26 +2,127 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
+/**
+ * Buna Bet brand tokens.
+ * Mirrored in tailwind.config.ts. Change both when re-skinning.
+ *
+ * Measured contrast ratios (WCAG 2.1), so pairings are not guesswork:
+ *   charcoal on sand ....... 13.2:1  AAA  body text, light sections
+ *   charcoal on paper ...... 15.0:1  AAA  body text, light sections
+ *   cherry   on sand ........ 5.2:1  AA   accent text + links, light sections
+ *   cherry   on paper ....... 5.8:1  AA   accent text + links, light sections
+ *   sand     on basalt ..... 14.2:1  AAA  body text, dark sections
+ *   qibe     on basalt ...... 7.1:1  AAA  accent text, dark sections
+ *   paper    on cherry ...... 5.8:1  AA   primary button label
+ *   paper    on forest ...... 8.6:1  AAA  secondary surface label
+ *
+ * Two pairings FAIL and must not be used:
+ *   cherry on basalt ........ 2.8:1  never use cherry for text on dark
+ *   qibe   on sand .......... 2.0:1  never use qibe for text on light
+ */
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --basalt: #1a1512;
+    --cherry: #a23b2e;
+    --qibe: #c89b3c;
+    --forest: #2f4a3c;
+    --sand: #ede3d0;
+    --charcoal: #241c16;
+    --paper: #f7f1e4;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--paper);
+    color: var(--charcoal);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: var(--qibe);
+    color: var(--basalt);
+  }
+
+  /* Honour the OS setting. Motion here is decoration, never information. */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* Mono eyebrow/label treatment: uppercase, letterspaced. */
+  .eyebrow {
+    @apply font-mono text-xs uppercase tracking-[0.18em];
+  }
+
+  /*
+   * Focus rings. Two variants because a single colour cannot clear the 3:1
+   * non-text contrast threshold on both the light and dark surfaces.
+   */
+  .focus-ring:focus-visible {
+    outline: 2px solid var(--cherry);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  .focus-ring-dark:focus-visible {
+    outline: 2px solid var(--qibe);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Fine woven grain. Stands in for the kemis textile texture without imagery. */
+  .weave-grain {
+    background-image: repeating-linear-gradient(
+        45deg,
+        rgb(36 28 22 / 0.025) 0px,
+        rgb(36 28 22 / 0.025) 1px,
+        transparent 1px,
+        transparent 7px
+      ),
+      repeating-linear-gradient(
+        -45deg,
+        rgb(36 28 22 / 0.025) 0px,
+        rgb(36 28 22 / 0.025) 1px,
+        transparent 1px,
+        transparent 7px
+      );
+  }
+
+  .weave-grain-dark {
+    background-image: repeating-linear-gradient(
+        45deg,
+        rgb(237 227 208 / 0.03) 0px,
+        rgb(237 227 208 / 0.03) 1px,
+        transparent 1px,
+        transparent 7px
+      ),
+      repeating-linear-gradient(
+        -45deg,
+        rgb(237 227 208 / 0.03) 0px,
+        rgb(237 227 208 / 0.03) 1px,
+        transparent 1px,
+        transparent 7px
+      );
   }
 }
