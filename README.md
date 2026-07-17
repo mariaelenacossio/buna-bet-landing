@@ -88,14 +88,39 @@ Everything below is a marked placeholder. Each is a single-point change.
 
 ## Deployment
 
-Vercel-ready as-is, with no configuration needed beyond the env var.
+Deploys to GitHub Pages as a static export, built by
+[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) on every push to
+`main`.
 
-1. Import the repo at [vercel.com/new](https://vercel.com/new)
-2. Add `NEXT_PUBLIC_FORM_ENDPOINT` under Settings > Environment Variables
-3. Deploy
+Live at **https://mariaelenacossio.github.io/buna-bet-landing/**
 
-A custom domain will be attached later and is deliberately not configured yet.
-Add `metadataBase` and an OG image in `app/layout.tsx` once the domain is known.
+`next.config.mjs` sets `output: 'export'` (writes `out/`), `images.unoptimized`
+(Pages cannot run the image optimizer), and a `basePath` of `/buna-bet-landing`
+because this is a project page rather than a root or custom-domain site.
+
+Two settings that will bite if forgotten:
+
+- **The form key must exist in CI.** `NEXT_PUBLIC_*` values are inlined at build
+  time, and this is a static export, so the key has to be present when the
+  Action runs or the deployed form can never send. Add it under
+  Settings > Secrets and variables > Actions as `NEXT_PUBLIC_FORM_ENDPOINT`.
+  Without it the build still passes and the form points visitors at the mailto
+  link instead.
+- **`public/.nojekyll` must stay.** Pages runs Jekyll by default, which ignores
+  directories starting with an underscore, including Next's `_next/`. Delete
+  that file and the site deploys with no CSS or JS.
+
+### Moving to a custom domain later
+
+1. Delete `basePath` and `assetPrefix` from `next.config.mjs`. Leaving them
+   serves the site at `example.com/buna-bet-landing/` and every asset 404s.
+2. Add `public/CNAME` containing the bare domain.
+3. At the registrar, point a `CNAME` record at `mariaelenacossio.github.io`, or
+   `A` records at GitHub's apex IPs for a root domain.
+4. Set `metadataBase` and add an OG image in `app/layout.tsx`.
+
+Vercel also still works from this repo. `output: 'export'` is compatible with
+it; the `basePath` is the only thing that would need removing.
 
 ## Notes
 
